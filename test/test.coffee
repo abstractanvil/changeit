@@ -15,19 +15,22 @@ test 'parsing properties', ->
 
 test 'calculate value at position', ->
   c = between(100).and(200).from('100px').to('200px')
-  deepEqual '150px', c.calculate(150)
-  deepEqual '175px', c.calculate(175)
+  t = c.currentTween
+  deepEqual '150px', t.calculate(150)
+  deepEqual '175px', t.calculate(175)
 
   c2 = between(100).and(200).from("50%").to("100%")
-  deepEqual '75%', c2.calculate(150)
-  deepEqual '50%', c2.calculate(100)
-  deepEqual '100%', c2.calculate(200)
+  t2 = c2.currentTween
+  deepEqual '75%', t2.calculate(150)
+  deepEqual '50%', t2.calculate(100)
+  deepEqual '100%', t2.calculate(200)
 
 test 'calculate percent', ->
-  c = new Changer(100).and(200)
-  deepEqual 0.5, c.toPercent(150)
-  deepEqual 0.25, c.toPercent(125)
-  deepEqual 1.0, c.toPercent(200)
+  c = between(100).and(200)
+  t = c.currentTween
+  deepEqual 0.5, t.toPercent(150)
+  deepEqual 0.25, t.toPercent(125)
+  deepEqual 1.0, t.toPercent(200)
 
 test 'parse css text', ->
   c = new Changer(1)

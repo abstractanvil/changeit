@@ -20,14 +20,31 @@
     return c;
   };
 
+  this.Tween = (function() {
+    function Tween() {}
+
+    Tween.prototype.toPercent = function(position) {
+      return (position - this.start) / (this.end - this.start);
+    };
+
+    Tween.prototype.calculate = function(position) {
+      return (((this.to.value - this.from.value) * this.toPercent(position)) + this.from.value) + this.to.unit;
+    };
+
+    return Tween;
+
+  })();
+
   this.Changer = (function() {
     function Changer(start) {
-      this.start = start;
+      this.currentTween = new Tween;
+      this.currentTween.start = start;
+      this.tweens = [this.currentTween];
       this;
     }
 
     Changer.prototype.and = function(end) {
-      this.end = end;
+      this.currentTween.end = end;
       return this;
     };
 
@@ -37,20 +54,32 @@
     };
 
     Changer.prototype.on = function(elSelector) {
-      this.elSelector = elSelector;
       this.el = document.querySelector(elSelector);
       return this;
     };
 
     Changer.prototype.from = function(fromRaw) {
-      this.fromRaw = fromRaw;
-      this.from = this.parseProperty(this.fromRaw);
+      this.currentTween.from = this.parseProperty(fromRaw);
       return this;
     };
 
     Changer.prototype.to = function(toRaw) {
-      this.toRaw = toRaw;
-      this.to = this.parseProperty(this.toRaw);
+      this.currentTween.to = this.parseProperty(toRaw);
+      return this;
+    };
+
+    Changer.prototype.then = function() {
+      this.currentTween = new Tween;
+      this.tweens.push(this.currentTween);
+      return this;
+    };
+
+    Changer.prototype.go = function() {
+      return this;
+    };
+
+    Changer.prototype.between = function(start) {
+      this.currentTween.start = start;
       return this;
     };
 
@@ -60,30 +89,32 @@
         match = /([\d\.]+)([\w\%]+)/.exec(property);
         return {
           value: parseFloat(match[1]),
-          unit: match[2]
+          unit: match[2],
+          raw: property
         };
       }
     };
 
     Changer.prototype.applyIt = function(position) {
-      var css;
+      var css, first, last, tween, _i, _len, _ref;
       css = this.parseCssText(this.el.style.cssText);
-      if (position >= this.start && position <= this.end) {
-        css[this.property] = this.calculate(position);
-      } else if (position < this.start) {
-        css[this.property] = this.fromRaw;
-      } else if (position > this.end) {
-        css[this.property] = this.toRaw;
+      first = this.tweens[0];
+      last = this.tweens[this.tweens.length - 1];
+      if (position < first.start) {
+        css[this.property] = first.from.raw;
+      } else if (position > last.end) {
+        css[this.property] = last.to.raw;
+      } else {
+        _ref = this.tweens;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          tween = _ref[_i];
+          if (position >= tween.start && position <= tween.end) {
+            css[this.property] = tween.calculate(position);
+            break;
+          }
+        }
       }
       return this.el.style.cssText = this.toCssText(css);
-    };
-
-    Changer.prototype.toPercent = function(position) {
-      return (position - this.start) / (this.end - this.start);
-    };
-
-    Changer.prototype.calculate = function(position) {
-      return (((this.to.value - this.from.value) * this.toPercent(position)) + this.from.value) + this.to.unit;
     };
 
     Changer.prototype.parseCssText = function(css) {
