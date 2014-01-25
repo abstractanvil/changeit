@@ -83,38 +83,49 @@ input[type='text'], input[type='number'] {
 body {
   height: 3000px;
   font-size: 21px;
+  color: #333;
+  font-family: 'Arial', sans-serif;
 }
 
 footer {
   height: 50%;
   width: 100%;
-  background: #39CCCC;
+  background: #39a3cc;
   position: fixed;
   bottom: 0;
-}
-
-h1 {
-  width: 200px;
-  margin: 0 auto;
-  text-align: center;
 }
 
 header {
   height: 50%;
   width: 100%;
-  background: #39CCCC;
+  background: #39a3cc;
   position: fixed;
   top: 0;
+}
+
+hgroup {
+  text-align: center;
+  position: absolute;
+  bottom: 32px;
+  width: 100%;
+}
+
+h1 {
+  font-size: 3em;
+  color: #fff;
 }
 
 
 section {
     width: 720px;
     margin: 700px auto;
-    opacity: 0.0;
-    z-index: -1;
 }
 
 p {
     margin: 32px 0;
+}
+
+#indicator {
+  margin-top: 32px;
+  text-align: center;
 }
