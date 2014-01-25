@@ -6,9 +6,7 @@
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       c = _ref[_i];
-      if (c.start <= y && c.end >= y) {
-        _results.push(c.applyIt(y));
-      }
+      _results.push(c.applyIt(y));
     }
     return _results;
   }, false);
@@ -44,13 +42,15 @@
       return this;
     };
 
-    Changer.prototype.from = function(from) {
-      this.from = this.parseProperty(from);
+    Changer.prototype.from = function(fromRaw) {
+      this.fromRaw = fromRaw;
+      this.from = this.parseProperty(this.fromRaw);
       return this;
     };
 
-    Changer.prototype.to = function(to) {
-      this.to = this.parseProperty(to);
+    Changer.prototype.to = function(toRaw) {
+      this.toRaw = toRaw;
+      this.to = this.parseProperty(this.toRaw);
       return this;
     };
 
@@ -68,7 +68,13 @@
     Changer.prototype.applyIt = function(position) {
       var css;
       css = this.parseCssText(this.el.style.cssText);
-      css[this.property] = this.calculate(position);
+      if (position >= this.start && position <= this.end) {
+        css[this.property] = this.calculate(position);
+      } else if (position < this.start) {
+        css[this.property] = this.fromRaw;
+      } else if (position > this.end) {
+        css[this.property] = this.toRaw;
+      }
       return this.el.style.cssText = this.toCssText(css);
     };
 

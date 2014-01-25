@@ -17,6 +17,12 @@ module.exports = (grunt) ->
     qunit:
       all: ['test/index.html']
 
+    watch:
+      main: 
+        files: ['src/changeit.coffee']
+        tasks: ['build']
+
+  grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-qunit'

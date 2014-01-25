@@ -1,6 +1,6 @@
 window.addEventListener 'scroll', (e)->
   y = window.pageYOffset
-  c.applyIt(y) for c in @changes when c.start <= y and c.end >= y
+  c.applyIt(y) for c in @changes
 , false
 
 @changes = []
@@ -17,22 +17,32 @@ class @Changer
   on: (@elSelector) ->
     @el = document.querySelector elSelector
     this
-  from: (from) -> 
-    @from = @parseProperty from
+  from: (@fromRaw) -> 
+    @from = @parseProperty @fromRaw
     this
-  to: (to) ->
-    @to = @parseProperty to
+  to: (@toRaw) ->
+    @to = @parseProperty @toRaw
     this
     
-
   parseProperty: (property) ->
     if property.match /[\d\.]+[\w\%]+/
       match = /([\d\.]+)([\w\%]+)/.exec property
       {value: parseFloat(match[1]), unit: match[2]}
 
   applyIt: (position) -> 
+
     css = @parseCssText @el.style.cssText
-    css[@property] = @calculate position
+
+    if position >= @start and position <= @end
+      # between, apply tween
+      css[@property] = @calculate position  
+    else if position < @start
+      # before, apply 'from'
+      css[@property] = @fromRaw
+    else if position > @end
+      # after, apply 'to'
+      css[@property] = @toRaw
+
     @el.style.cssText = @toCssText css
 
   toPercent: (position) -> (position - @start) / (@end - @start)
